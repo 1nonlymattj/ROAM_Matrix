@@ -1,0 +1,44 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="public/css/ROAM_Styles.css">
+  <title>Sticky Notes App</title>
+</head>
+<body>
+  <div id="app">
+    <div id="sticky-notes-container"></div>
+    <textarea id="new-note" placeholder="Type your Risk here"></textarea>
+    <button onclick="addNote()">Add Risk</button>
+  </div>
+  <div id="ROAM_Table">
+    <table>
+        <thead>
+          <tr>
+            <th>RESOLVED</th>
+            <th>OWNED</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>ACCEPTED</th>
+            <th>MITIGATED</th>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+  </div>
+  <script src="resources/js/app.js"></script>
+</body>
+</html>
