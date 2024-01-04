@@ -10,6 +10,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('public'));
+app.use((req, res, next) => {
+    res.header('Content-Type', 'text/css');
+    next();
+});
 
 // API endpoints
 let notes = [];

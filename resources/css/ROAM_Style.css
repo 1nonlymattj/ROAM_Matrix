@@ -4,10 +4,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#app {
-    padding: 20px;
-}
-
 #sticky-notes-container {
     display: flex;
     flex-wrap: wrap;
@@ -16,22 +12,29 @@ body {
 }
 
 .sticky-note {
+    position: absolute;
     background-color: #e86969;
+    color: #ffffff;
     padding: 10px;
     cursor: move;
     white-space: pre-wrap;
     max-width: 150px;
     font-size: 14px;
+    margin-left: 30px;
 }
 
 .delete-button {
     background-color: transparent;
     color: #ffffff;
     border: none;
-    padding: 2px;
+    /* padding: 2px; */
+    padding: 0px 0px 30px 0px;
     cursor: pointer;
     font-size: 16px;
     text-align: left;
+    min-width: 10px !important;
+    max-width: 10px !important;
+    height: 10px !important;
 }
 
 textarea {
