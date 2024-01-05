@@ -16,7 +16,7 @@ body {
     background-color: #e86969;
     color: #ffffff;
     padding: 10px;
-    cursor: move;
+    cursor: grab;
     white-space: pre-wrap;
     max-width: 150px;
     font-size: 14px;
