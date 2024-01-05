@@ -7,6 +7,17 @@ let noteIdCounter = 0; // Initialize the counter
 let savedPickKey = "";
 let selectedIdArray = [];
 
+const socket = io();
+const notesContainer = document.getElementById('sticky-notes-container');
+
+
+socket.on('initialNotes', (initialNotes) => {
+    initialNotes.forEach((note) => appendNoteElement(note));
+});
+
+socket.on('updateNote', (updatedNote) => {
+    updateNoteElement(updatedNote);
+});
 
 function loadNotes() {
     const notesContainer = document.getElementById('sticky-notes-container');
@@ -112,4 +123,61 @@ function getNoteId() {
         savedPickKey = 'note- ' + num;
     }
     return savedPickKey;
+}
+
+function updateNoteElement(updatedNote) {
+    const noteElement = document.getElementById(updatedNote.id);
+
+    if (noteElement) {
+        // Update note position
+        noteElement.style.left = updatedNote.left + 'px';
+        noteElement.style.top = updatedNote.top + 'px';
+    } else {
+        // Create a new note
+        const newNoteElement = document.createElement('div');
+        newNoteElement.id = updatedNote.id;
+        newNoteElement.className = 'sticky-note';
+        newNoteElement.style.backgroundColor = updatedNote.color;
+        newNoteElement.style.left = updatedNote.left + 'px';
+        newNoteElement.style.top = updatedNote.top + 'px';
+        newNoteElement.textContent = updatedNote.text;
+
+        // Enable draggable behavior
+        newNoteElement.draggable = true;
+        newNoteElement.addEventListener('dragend', () => updateNotePosition(newNoteElement, updatedNote));
+
+        notesContainer.appendChild(newNoteElement);
+    }
+}
+
+function updateNotePosition(noteElement, updatedNote) {
+    const rect = noteElement.getBoundingClientRect();
+    const updatedNoteData = {
+        id: updatedNote.id,
+        text: updatedNote.text,
+        color: updatedNote.color,
+        left: rect.left,
+        top: rect.top,
+    };
+
+    socket.emit('updateNote', updatedNoteData);
+}
+
+// Handle adding a new note
+document.addEventListener('click', (event) => {
+    if (event.target === document.body) {
+        const newNote = {
+            id: generateUniqueId(),
+            text: 'New Note',
+            color: getRandomColor(),
+            left: event.clientX,
+            top: event.clientY,
+        };
+
+        socket.emit('updateNote', newNote);
+    }
+});
+
+function generateUniqueId() {
+    return '_' + Math.random().toString(36).substr(2, 9);
 }

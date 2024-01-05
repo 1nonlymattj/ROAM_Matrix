@@ -1,130 +1,67 @@
-// app.js
+const socket = io();
+const notesContainer = document.getElementById('sticky-notes-container');
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadNotes();
+socket.on('initialNotes', (initialNotes) => {
+    initialNotes.forEach((note) => appendNoteElement(note));
 });
 
-function loadNotes() {
-    const notesContainer = document.getElementById('sticky-notes-container');
-    notesContainer.innerHTML = '';
+socket.on('updateNotes', (updatedNotes) => {
+    notesContainer.innerHTML = ''; // Clear existing notes
+    updatedNotes.forEach((note) => appendNoteElement(note));
+});
 
-    const savedNotes = JSON.parse(localStorage.getItem('stickyNotes')) || [];
-
-    savedNotes.forEach(note => {
-        const noteElement = createNoteElement(note);
-        notesContainer.appendChild(noteElement);
-    });
-
-    makeNotesDraggable();
-}
-
-function createNoteElement(note) {
+function appendNoteElement(note) {
     const noteElement = document.createElement('div');
     noteElement.className = 'sticky-note';
-    noteElement.innerText = note.text;
-    noteElement.style.backgroundColor = note.color || 'red';
-    noteElement.style.left = note.left || '100px';
-    noteElement.style.top = note.top || '100px';
+    noteElement.style.backgroundColor = note.color;
+    noteElement.style.left = note.left + 'px';
+    noteElement.style.top = note.top + 'px';
+    noteElement.textContent = note.text;
 
-    noteElement.setAttribute('draggable', 'true');
-    noteElement.setAttribute('contenteditable', 'true');
-    noteElement.setAttribute('onmousedown', 'bringToFront(event)');
-    noteElement.setAttribute('resizeable', 'true');
-    noteElement.addEventListener('dragstart', drag);
-    noteElement.addEventListener('input', saveNotes);
-
-    return noteElement;
-}
-
-function makeNotesDraggable() {
-    const notes = document.querySelectorAll('.sticky-note');
-    notes.forEach(note => {
-        note.addEventListener('dragstart', drag);
-    });
-}
-
-function bringToFront(event) {
-    const selectedNote = event.target.closest('.sticky-note');
-    const notes = document.querySelectorAll('.sticky-note');
-
-    notes.forEach(note => {
-        note.style.zIndex = 1;
-    });
-
-    selectedNote.style.zIndex = 2;
-}
-
-function drag(event) {
-    event.dataTransfer.setData('text/plain', JSON.stringify({ id: event.target.id, x: event.clientX, y: event.clientY }));
-    document.addEventListener('dragover', dragOver);
-    document.addEventListener('dragend', dragEnd);
-}
-
-function dragOver(event) {
-    event.preventDefault();
-
-    const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    const offsetX = event.clientX - data.x;
-    const offsetY = event.clientY - data.y;
-
-    const noteElement = document.getElementById(data.id);
-    const rect = noteElement.getBoundingClientRect();
-
-    noteElement.style.left = rect.left + offsetX + 'px';
-    noteElement.style.top = rect.top + offsetY + 'px';
-
-    data.x = event.clientX;
-    data.y = event.clientY;
-}
-
-function dragEnd() {
-    document.removeEventListener('dragover', dragOver);
-    document.removeEventListener('dragend', dragEnd);
-    saveNotes();
-}
-
-function addNote() {
-    const newNoteText = document.getElementById('new-note').value;
-
-    if (newNoteText.trim() === '') {
-        alert('Please enter a note before adding.');
-        return;
-    }
-
-    const notesContainer = document.getElementById('sticky-notes-container');
-    const noteElement = createNoteElement({
-        text: newNoteText,
-        color: getRiskColor(),
-        left: '50px',
-        top: '50px'
-    });
+    // Enable draggable behavior
+    noteElement.draggable = true;
+    noteElement.addEventListener('dragend', () => updateNotePosition(noteElement, note));
 
     notesContainer.appendChild(noteElement);
-    makeNotesDraggable();
-    saveNotes();
-
-    document.getElementById('new-note').value = '';
 }
 
-function saveNotes() {
-    const notes = [];
-    const notesElements = document.querySelectorAll('.sticky-note');
+function updateNotePosition(noteElement, note) {
+    const rect = noteElement.getBoundingClientRect();
+    const updatedNote = {
+        id: note.id,
+        text: noteElement.textContent,
+        color: noteElement.style.backgroundColor,
+        left: rect.left,
+        top: rect.top,
+    };
 
-    notesElements.forEach(noteElement => {
-        const note = {
-            text: noteElement.innerText,
-            color: noteElement.style.backgroundColor,
-            left: noteElement.style.left,
-            top: noteElement.style.top
+    socket.emit('updateNote', updatedNote);
+}
+
+// Handle adding a new note
+document.addEventListener('click', (event) => {
+    if (event.target === document.body) {
+        const newNote = {
+            id: generateUniqueId(),
+            text: 'New Note',
+            color: getRandomColor(),
+            left: event.clientX,
+            top: event.clientY,
         };
 
-        notes.push(note);
-    });
+        socket.emit('updateNote', newNote);
+    }
+});
 
-    localStorage.setItem('stickyNotes', JSON.stringify(notes));
+function generateUniqueId() {
+    return '_' + Math.random().toString(36).substr(2, 9);
 }
 
-function getRiskColor() {
-    let color = '#e86969';
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
     return color;
 }

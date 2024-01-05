@@ -1,38 +1,44 @@
-// server.js
-
 const express = require('express');
-const bodyParser = require('body-parser');
+const http = require('http');
+const socketIO = require('socket.io');
+
 const app = express();
-const port = 3000;
+const server = http.createServer(app);
+const io = socketIO(server);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public')); // Assume your HTML and JS files are in a 'public' folder
 
-// Serve static files (HTML, CSS, JS)
-app.use(express.static('public'));
-app.use((req, res, next) => {
-    res.header('Content-Type', 'text/css');
-    next();
+const notes = [];
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    // Send existing notes to the newly connected user
+    socket.emit('initialNotes', notes);
+
+    // Handle incoming note updates
+    socket.on('updateNote', (updatedNote) => {
+        const existingNoteIndex = notes.findIndex((note) => note.id === updatedNote.id);
+
+        if (existingNoteIndex !== -1) {
+            // Update existing note
+            notes[existingNoteIndex] = updatedNote;
+        } else {
+            // Add new note
+            notes.push(updatedNote);
+        }
+
+        // Broadcast the updated notes to all connected clients
+        io.emit('updateNotes', notes);
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 });
 
-// API endpoints
-let notes = [];
-
-app.get('/api/notes', (req, res) => {
-    res.json(notes);
-});
-
-app.post('/api/notes', (req, res) => {
-    const newNote = req.body;
-    notes.push(newNote);
-    res.json({ success: true });
-});
-
-app.put('/api/notes', (req, res) => {
-    notes = req.body;
-    res.json({ success: true });
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
