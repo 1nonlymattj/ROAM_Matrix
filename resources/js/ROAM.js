@@ -114,18 +114,6 @@ function getNoteId() {
     return savedPickKey;
 }
 
-// function takeScreenshot() {
-//     const element = document.getElementById('contentToScreenshot');
-
-//     html2canvas(element).then(function (canvas) {
-//         // Convert the canvas to an image and open it in a new window
-//         const screenshotImage = new Image();
-//         screenshotImage.src = canvas.toDataURL();
-//         const newWindow = window.open();
-//         newWindow.document.write("<img src='" + screenshotImage.src + "' alt='Screenshot'>");
-//     });
-// }
-
 function takeAndSaveScreenshot() {
     const element = document.getElementById('contentToScreenshot');
 
