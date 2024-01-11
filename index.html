@@ -13,12 +13,16 @@
     <a><button onclick="CreateRiskDialog()"><i class="fa-solid fa-note-sticky"></i></button></a>
     <a></a>
     <a></a>
+    <a></a>
+    <a><button onclick="takeScreenshot()"><i class="fa-solid fa-floppy-disk"></i></button></a>
   </div>
   <div class="main-content">
-    <div id="app">
-      <div id="sticky-notes-container"></div>
+    <div id="contentToScreenshot">
+      <div id="app">
+        <div id="sticky-notes-container"></div>
+        </div>
+        <div id="ROAM_Table"></div>
       </div>
-      <div id="ROAM_Table"></div>
     </div>
   </div>
 
@@ -30,6 +34,7 @@
   <script src="resources/js/CreateStickyNote.js"></script>
   <script src="resources/js/DragandDrop.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script
       src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
       <script src="https://kit.fontawesome.com/2e1e4a69a5.js" crossorigin="anonymous"></script>
