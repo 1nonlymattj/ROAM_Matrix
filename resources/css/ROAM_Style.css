@@ -46,11 +46,20 @@ button {
     cursor: pointer;
     min-width: 40px;
     height: 40px;
-    background-color: #e86969;
-    color: #ffffff;
+
     border-radius: 3px;
     font-size: 25px;
     font-weight: 500;
+}
+
+.riskButton {
+    background-color: #e86969;
+    color: #ffffff;
+}
+
+.screenshot {
+    background-color: #81da79;
+    color: #ffffff;
 }
 
 table {
